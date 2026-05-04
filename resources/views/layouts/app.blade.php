@@ -7,7 +7,7 @@
     $aboutUrl = $aboutUrl ?? ($homeUrl.'#sobre');
     $localeUrls = $localeUrls ?? [
         'pt' => route('home'),
-        'en' => route('en.home'),
+        // 'en' => route('en.home'), // PT/EN: rotas /en desativadas
     ];
 @endphp
 
@@ -36,6 +36,7 @@
                 <div class="mx-auto w-full max-w-5xl px-6 py-6 lg:px-8">
                     <div class="flex items-center justify-between text-[0.7rem] font-medium uppercase tracking-[0.34em] text-white/45">
                         <span>{{ __('blog.brand') }}</span>
+                        {{-- PT/EN: seletor de idioma desativado
                         <div class="flex items-center gap-2">
                             <a href="{{ $localeUrls['pt'] }}" class="{{ $currentLocale === 'pt' ? 'text-[#fc8e00]' : 'text-white/45 hover:text-white/70' }} transition focus:outline-none focus:ring-2 focus:ring-[#fc8e00]/60 focus:ring-offset-2 focus:ring-offset-[#151515]">
                                 {{ __('blog.language.pt') }}
@@ -45,6 +46,7 @@
                                 {{ __('blog.language.en') }}
                             </a>
                         </div>
+                        --}}
                     </div>
 
                     <div class="mt-6 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">

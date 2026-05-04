@@ -66,7 +66,7 @@ class BlogController extends Controller
     {
         return [
             'pt' => route('blog.index'),
-            'en' => route('en.blog.index'),
+            // 'en' => route('en.blog.index'), // PT/EN: rotas /en desativadas
         ];
     }
 
@@ -77,7 +77,7 @@ class BlogController extends Controller
     {
         return [
             'pt' => route('blog.tag', $tag),
-            'en' => route('en.blog.tag', $tag),
+            // 'en' => route('en.blog.tag', $tag), // PT/EN: rotas /en desativadas
         ];
     }
 
@@ -86,16 +86,18 @@ class BlogController extends Controller
      */
     private function localeUrlsForPost(\App\Services\Blog\BlogPostData $post): array
     {
-        $englishTranslation = $this->blogPosts->findTranslation($post, 'en');
+        // $englishTranslation = $this->blogPosts->findTranslation($post, 'en'); // PT/EN
         $portugueseTranslation = $this->blogPosts->findTranslation($post, 'pt');
 
         return [
             'pt' => $post->locale === 'pt'
                 ? route('blog.show', $post->slug)
                 : ($portugueseTranslation !== null ? route('blog.show', $portugueseTranslation->slug) : route('blog.index')),
+            /*
             'en' => $post->locale === 'en'
                 ? route('en.blog.show', $post->slug)
                 : ($englishTranslation !== null ? route('en.blog.show', $englishTranslation->slug) : route('en.blog.index')),
+            */
         ];
     }
 

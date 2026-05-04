@@ -22,7 +22,7 @@ class HomeController extends Controller
             'canonical' => route(LocalizedRoute::routeName($locale, 'home')),
             'localeUrls' => [
                 'pt' => route('home'),
-                'en' => route('en.home'),
+                // 'en' => route('en.home'), // PT/EN: rotas /en desativadas
             ],
         ]));
     }

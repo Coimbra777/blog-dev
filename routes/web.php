@@ -22,6 +22,11 @@ Route::controller(BlogController::class)->group(function () {
         ->name('blog.show');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Rotas em inglês (/en/...) — desativadas (PT/EN comentado)
+|--------------------------------------------------------------------------
+|
 Route::prefix('en')
     ->as('en.')
     ->group(function (): void {
@@ -43,3 +48,5 @@ Route::prefix('en')
                 ->name('blog.show');
         });
     });
+|
+*/
