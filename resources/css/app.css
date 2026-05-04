@@ -1,4 +1,8 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+@source "../../resources/views/**/*.blade.php";
+@source "../../resources/js/**/*.js";
+@source "../../app/**/*.php";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -7,9 +11,11 @@
 @source "../**/*.vue";
 
 @theme {
-    --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --font-sans:
+        "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
 @layer base {
