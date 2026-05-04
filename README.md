@@ -76,9 +76,40 @@ Para gerar os assets de produção:
 docker compose exec app npm run build
 ```
 
+Se o container `app` não possuir Node.js instalado, rode localmente:
+
+```sh
+npm install
+npm run build
+```
+
 ## Fluxo de publicação via commit/push
 
 1. Adicione ou edite um arquivo em `resources/posts`.
 2. Revise o front matter e o conteúdo Markdown.
 3. Faça `git add`, `git commit` e `git push`.
 4. Após o deploy, o novo post aparecerá automaticamente em `/blog`.
+
+## Deploy no Render
+
+O blog não depende de banco para posts e não exige Node em runtime, apenas no passo de build.
+
+Variáveis mínimas esperadas:
+
+```sh
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://seu-dominio.com
+```
+
+Fluxo sugerido:
+
+```sh
+composer install --no-dev --optimize-autoloader
+npm install
+npm run build
+php artisan config:cache
+php artisan route:cache
+```
+
+Os posts continuam sendo publicados apenas por commit/push dos arquivos Markdown em `resources/posts`.

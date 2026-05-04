@@ -16,25 +16,42 @@
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
     </head>
-    <body class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(14,116,144,0.12),_transparent_35%),linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_100%)] text-slate-900">
-        <div class="min-h-screen">
-            <header class="border-b border-slate-200/80 bg-white/75 backdrop-blur">
-                <div class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5 lg:px-8">
-                    <a href="{{ url('/') }}" class="flex items-center gap-3 text-sm font-semibold tracking-[0.22em] text-slate-950 uppercase">
-                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-cyan-200 bg-cyan-50 text-cyan-700">C</span>
-                        <span>{{ config('app.name', 'Code') }}</span>
-                    </a>
+    <body class="min-h-screen bg-[#151515] text-[#f9f9f9] antialiased">
+        <div class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(252,142,0,0.08),_transparent_28%),linear-gradient(180deg,_rgba(255,255,255,0.02),_transparent_22%)]">
+            <header class="border-b border-white/10">
+                <div class="mx-auto w-full max-w-5xl px-6 py-6 lg:px-8">
+                    <div class="flex items-center justify-between text-[0.7rem] font-medium uppercase tracking-[0.34em] text-white/45">
+                        <span>Gabriel Coimbra</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[#fc8e00]">PT</span>
+                            <span>/</span>
+                            <span>EN</span>
+                        </div>
+                    </div>
 
-                    <nav class="flex items-center gap-5 text-sm text-slate-600">
-                        <a href="{{ url('/') }}" class="transition hover:text-slate-950">Home</a>
-                        <a href="{{ route('blog.index') }}" class="transition hover:text-slate-950">Blog</a>
-                    </nav>
+                    <div class="mt-6 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                        <a href="{{ url('/') }}" class="text-2xl font-semibold tracking-tight text-[#f9f9f9] transition hover:text-[#fc8e00]">
+                            Gabriel Coimbra
+                        </a>
+
+                        <nav class="flex items-center gap-5 text-sm text-white/70">
+                            <a href="{{ url('/') }}" class="transition hover:text-[#fc8e00] focus:outline-none focus:ring-2 focus:ring-[#fc8e00]/60 focus:ring-offset-2 focus:ring-offset-[#151515]">Home</a>
+                            <a href="{{ route('blog.index') }}" class="transition hover:text-[#fc8e00] focus:outline-none focus:ring-2 focus:ring-[#fc8e00]/60 focus:ring-offset-2 focus:ring-offset-[#151515]">Posts</a>
+                            <a href="{{ url('/#sobre') }}" class="transition hover:text-[#fc8e00] focus:outline-none focus:ring-2 focus:ring-[#fc8e00]/60 focus:ring-offset-2 focus:ring-offset-[#151515]">Sobre</a>
+                        </nav>
+                    </div>
                 </div>
             </header>
 
-            <main class="mx-auto w-full max-w-6xl px-6 py-10 lg:px-8 lg:py-16">
+            <main class="mx-auto w-full max-w-5xl px-6 py-12 lg:px-8 lg:py-16">
                 @yield('content')
             </main>
+
+            <footer class="border-t border-white/10">
+                <div class="mx-auto w-full max-w-5xl px-6 py-6 text-sm text-white/45 lg:px-8">
+                    © 2026 Gabriel Coimbra. Todos os direitos reservados.
+                </div>
+            </footer>
         </div>
     </body>
 </html>
