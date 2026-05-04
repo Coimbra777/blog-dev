@@ -1,0 +1,58 @@
+<?php
+
+return [
+    'site_title' => 'Gabriel Coimbra | Backend, Laravel and Architecture',
+    'site_description' => 'Backend developer focused on Laravel, Node.js, APIs, Docker, and software architecture.',
+    'brand' => 'Gabriel Coimbra',
+    'brand_short' => 'GC',
+    'nav' => [
+        'home' => 'Home',
+        'posts' => 'Posts',
+        'about' => 'About',
+    ],
+    'language' => [
+        'pt' => 'PT',
+        'en' => 'EN',
+    ],
+    'footer' => 'All rights reserved.',
+    'home' => [
+        'eyebrow' => 'Backend Engineer',
+        'headline' => 'Gabriel Coimbra',
+        'description' => 'Backend developer focused on Laravel, Node.js, APIs, Docker, and software architecture.',
+        'cta_posts' => 'Read Posts',
+        'about_link' => 'About',
+        'focus_title' => 'Focus',
+        'focus_items' => [
+            'REST APIs and integrations',
+            'Docker-based workflows',
+            'Simple and sustainable architecture',
+            'Code quality and continuous delivery',
+        ],
+        'about_eyebrow' => 'About',
+        'about_title' => 'Software engineering with emphasis on clarity, maintainability, and execution.',
+        'about_paragraph_1' => 'This space brings together technical articles, project lessons, and notes about real backend decisions.',
+        'about_paragraph_2' => 'The goal is direct writing with no visual excess, focused on architecture, APIs, Laravel, and development infrastructure.',
+    ],
+    'blog' => [
+        'eyebrow' => 'Posts',
+        'title' => 'Recent posts',
+        'description' => 'Articles about Laravel, APIs, Docker, and architecture decisions with a pragmatic backend focus.',
+        'back_to_posts' => 'Back to Posts',
+        'post_label' => 'Post',
+        'tag_label' => 'Tag',
+        'tag_title' => 'Posts tagged: :tag',
+        'tag_description' => 'Content filtered by topic while keeping the same clean structure as the main listing.',
+        'no_posts' => 'No posts found',
+        'no_posts_hint' => 'Add Markdown files under :path to populate this page automatically.',
+        'no_tag_posts' => 'No posts found for this tag.',
+        'tag_hint' => 'Publish an article with the tag :tag to make it show up here.',
+        'draft' => 'Draft',
+        'reading_time' => ':minutes min read',
+    ],
+    '404' => [
+        'title' => 'Post or page not found.',
+        'description' => 'The requested content may have been removed, renamed, or not published yet.',
+        'go_posts' => 'Go to Posts',
+        'go_home' => 'Back to Home',
+    ],
+];

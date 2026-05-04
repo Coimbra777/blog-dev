@@ -1,33 +1,51 @@
 # Blog Técnico com Laravel 12
 
-Este projeto contém um blog técnico em Laravel com posts versionados em Markdown dentro do próprio repositório. Não existe banco de dados para os artigos: o conteúdo é lido a partir de arquivos em `resources/posts`.
+Este projeto contém um blog técnico em Laravel com posts em Markdown versionados no repositório. O conteúdo é multilíngue por diretório, sem banco de dados para os artigos.
 
-## Rodando localmente com Docker
+## Rodando localmente
 
 ```sh
 cp .env.example .env
 docker compose up -d
 docker compose exec app composer install
 docker compose exec app php artisan key:generate
-docker compose exec app npm install
 ```
 
-Para desenvolvimento com assets em watch, rode o Vite no container ou localmente conforme sua configuração.
+Para o frontend:
 
-## Estrutura do blog
+```sh
+npm install
+npm run build
+```
 
-- Lista de posts: `/blog`
-- Detalhe do post: `/blog/{slug}`
-- Filtro por tag: `/blog/tag/{tag}`
-- Arquivos Markdown: `resources/posts/*.md`
+Se seu container `app` também tiver Node.js, você pode rodar os comandos de frontend dentro dele.
 
-## Como criar um novo post
+## Rotas do blog
 
-1. Crie um novo arquivo `.md` em `resources/posts`.
-2. Adicione o front matter YAML no topo.
-3. Faça commit e push do arquivo para publicar junto com a aplicação.
+- Português:
+  - `/`
+  - `/blog`
+  - `/blog/{slug}`
+  - `/blog/tag/{tag}`
+- Inglês:
+  - `/en`
+  - `/en/blog`
+  - `/en/blog/{slug}`
+  - `/en/blog/tag/{tag}`
 
-Exemplo:
+## Estrutura dos posts
+
+```text
+resources/posts/
+  pt/
+  en/
+```
+
+Cada idioma possui sua própria listagem. Os posts não são misturados entre PT e EN.
+
+## Como criar um post em português
+
+Crie um arquivo em `resources/posts/pt`:
 
 ```md
 ---
@@ -37,6 +55,7 @@ description: "Resumo curto do post"
 date: "2026-05-04"
 tags: ["laravel", "docker", "backend"]
 draft: false
+translation_key: "meu-post-traduzivel"
 ---
 
 # Conteúdo do post
@@ -44,17 +63,50 @@ draft: false
 Texto do artigo em Markdown.
 ```
 
+## Como criar um post em inglês
+
+Crie um arquivo em `resources/posts/en`:
+
+```md
+---
+title: "Post title"
+slug: "post-slug"
+description: "Short summary"
+date: "2026-05-04"
+tags: ["laravel", "docker", "backend"]
+draft: false
+translation_key: "meu-post-traduzivel"
+---
+
+# Post content
+
+English article text.
+```
+
+## Como ligar traduções com `translation_key`
+
+- Use o mesmo `translation_key` no arquivo PT e no arquivo EN.
+- O seletor `PT / EN` tenta abrir a página equivalente no outro idioma.
+- Se não houver tradução para um post, o seletor cai para a listagem do idioma correspondente.
+
 ## Regras de publicação
 
-- Posts com `draft: false` aparecem normalmente.
-- Posts com `draft: true` ficam visíveis apenas em ambiente local.
-- Em produção, drafts não aparecem na listagem e retornam `404` no detalhe.
+- `draft: false` publica normalmente.
+- `draft: true` aparece apenas em ambiente local.
+- Em produção, drafts não entram na listagem e retornam `404` no detalhe.
+
+## Publicação
+
+1. Adicione ou edite um arquivo em `resources/posts/pt` ou `resources/posts/en`.
+2. Revise o front matter e o conteúdo Markdown.
+3. Faça `git add`, `git commit` e `git push`.
+4. Após o deploy, o novo post aparecerá automaticamente na rota correspondente ao idioma.
 
 ## Cache do blog
 
-Os posts são cacheados com `Cache::remember()` por alguns minutos para evitar parsing completo a cada request.
+Os posts são cacheados com `Cache::remember()` por idioma.
 
-Para limpar o cache manualmente:
+Para limpar manualmente:
 
 ```sh
 docker compose exec app php artisan cache:clear
@@ -62,54 +114,53 @@ docker compose exec app php artisan cache:clear
 
 ## Testes
 
-Rode os testes de feature e unidade com:
-
 ```sh
-docker compose exec app php artisan test
+docker compose run --rm app php artisan test
 ```
 
-## Build de frontend
-
-Para gerar os assets de produção:
+## Build do frontend
 
 ```sh
-docker compose exec app npm run build
-```
-
-Se o container `app` não possuir Node.js instalado, rode localmente:
-
-```sh
-npm install
 npm run build
 ```
-
-## Fluxo de publicação via commit/push
-
-1. Adicione ou edite um arquivo em `resources/posts`.
-2. Revise o front matter e o conteúdo Markdown.
-3. Faça `git add`, `git commit` e `git push`.
-4. Após o deploy, o novo post aparecerá automaticamente em `/blog`.
 
 ## Deploy no Render
 
-O blog não depende de banco para posts e não exige Node em runtime, apenas no passo de build.
+O blog não exige banco nem Redis para funcionar. Para uma configuração simples no Render, use cache em arquivo.
 
-Variáveis mínimas esperadas:
+### Variáveis de ambiente mínimas
 
 ```sh
+APP_NAME="Gabriel Coimbra"
 APP_ENV=production
+APP_KEY=base64:...
 APP_DEBUG=false
 APP_URL=https://seu-dominio.com
+CACHE_STORE=file
+LOG_CHANNEL=stderr
 ```
 
-Fluxo sugerido:
+### Build command recomendado
 
 ```sh
 composer install --no-dev --optimize-autoloader
-npm install
+npm ci
 npm run build
 php artisan config:cache
 php artisan route:cache
+php artisan view:cache
 ```
 
-Os posts continuam sendo publicados apenas por commit/push dos arquivos Markdown em `resources/posts`.
+Se `npm ci` não puder ser usado por ausência de lock compatível no ambiente, use `npm install`.
+
+### Start command recomendado
+
+```sh
+php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
+```
+
+### Observações para Render
+
+- O Render fornece a variável `$PORT`.
+- As rotas estão prontas para `php artisan route:cache`.
+- O conteúdo do blog continua sendo publicado apenas por commit/push dos arquivos Markdown.

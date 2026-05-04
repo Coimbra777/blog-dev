@@ -1,0 +1,58 @@
+<?php
+
+return [
+    'site_title' => 'Gabriel Coimbra | Backend, Laravel e Arquitetura',
+    'site_description' => 'Desenvolvedor Backend focado em Laravel, Node.js, APIs, Docker e arquitetura de software.',
+    'brand' => 'Gabriel Coimbra',
+    'brand_short' => 'GC',
+    'nav' => [
+        'home' => 'Home',
+        'posts' => 'Posts',
+        'about' => 'Sobre',
+    ],
+    'language' => [
+        'pt' => 'PT',
+        'en' => 'EN',
+    ],
+    'footer' => 'Todos os direitos reservados.',
+    'home' => [
+        'eyebrow' => 'Backend Engineer',
+        'headline' => 'Gabriel Coimbra',
+        'description' => 'Desenvolvedor Backend focado em Laravel, Node.js, APIs, Docker e arquitetura de software.',
+        'cta_posts' => 'Ver Posts',
+        'about_link' => 'Sobre',
+        'focus_title' => 'Foco',
+        'focus_items' => [
+            'APIs REST e integrações',
+            'Containerização com Docker',
+            'Arquitetura simples e sustentável',
+            'Qualidade de código e entrega contínua',
+        ],
+        'about_eyebrow' => 'Sobre',
+        'about_title' => 'Engenharia de software com ênfase em clareza, manutenção e execução.',
+        'about_paragraph_1' => 'Este espaço reúne artigos técnicos, aprendizados de projeto e anotações sobre decisões reais de backend.',
+        'about_paragraph_2' => 'A proposta é manter uma escrita direta, sem excesso visual, com foco em arquitetura, APIs, Laravel e infraestrutura de desenvolvimento.',
+    ],
+    'blog' => [
+        'eyebrow' => 'Posts',
+        'title' => 'Postagens recentes',
+        'description' => 'Artigos sobre Laravel, APIs, Docker e decisões de arquitetura com foco em backend pragmático.',
+        'back_to_posts' => 'Voltar para Posts',
+        'post_label' => 'Post',
+        'tag_label' => 'Tag',
+        'tag_title' => 'Posts com a tag: :tag',
+        'tag_description' => 'Conteúdo filtrado por assunto, mantendo a mesma estrutura limpa da listagem principal.',
+        'no_posts' => 'Nenhum post encontrado',
+        'no_posts_hint' => 'Adicione arquivos Markdown em :path para popular esta página automaticamente.',
+        'no_tag_posts' => 'Nenhum post encontrado para esta tag.',
+        'tag_hint' => 'Publique um artigo com a tag :tag para vê-lo aparecer aqui.',
+        'draft' => 'Draft',
+        'reading_time' => ':minutes min de leitura',
+    ],
+    '404' => [
+        'title' => 'Post ou página não encontrado.',
+        'description' => 'O conteúdo solicitado pode ter sido removido, renomeado ou ainda não foi publicado.',
+        'go_posts' => 'Ir para Posts',
+        'go_home' => 'Voltar para a home',
+    ],
+];

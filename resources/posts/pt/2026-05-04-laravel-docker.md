@@ -5,6 +5,7 @@ description: "Uma abordagem simples para publicar artigos em Markdown versionado
 date: "2026-05-04"
 tags: ["laravel", "docker", "backend"]
 draft: false
+translation_key: "laravel-docker-post"
 ---
 
 # Organizando conteúdo técnico no repositório

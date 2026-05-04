@@ -5,6 +5,7 @@ description: "Notas iniciais sobre logs, métricas úteis e alertas proporcionai
 date: "2026-05-06"
 tags: ["observabilidade", "backend"]
 draft: true
+translation_key: "pragmatic-observability-draft"
 ---
 
 # Observabilidade proporcional ao sistema

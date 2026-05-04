@@ -5,6 +5,7 @@ description: "Como reduzir leitura repetida de arquivos e renderizar Markdown co
 date: "2026-05-05"
 tags: ["cache", "markdown", "seguranca"]
 draft: false
+translation_key: "secure-markdown-cache"
 ---
 
 # Cache e segurança andam juntos

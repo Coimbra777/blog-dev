@@ -2,6 +2,7 @@
 
 namespace App\Services\Blog;
 
+use App\Support\LocalizedRoute;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -20,27 +21,27 @@ class BlogPostService
     /**
      * @return Collection<int, BlogPostData>
      */
-    public function all(?bool $includeDrafts = null): Collection
+    public function all(string $locale, ?bool $includeDrafts = null): Collection
     {
-        return $this->posts()
+        return $this->posts($locale)
             ->filter(fn (BlogPostData $post) => $this->shouldExpose($post, $includeDrafts))
             ->values();
     }
 
-    public function findBySlug(string $slug, ?bool $includeDrafts = null): ?BlogPostData
+    public function findBySlug(string $locale, string $slug, ?bool $includeDrafts = null): ?BlogPostData
     {
-        return $this->all($includeDrafts)
+        return $this->all($locale, $includeDrafts)
             ->first(fn (BlogPostData $post) => $post->slug === $slug);
     }
 
     /**
      * @return Collection<int, BlogPostData>
      */
-    public function byTag(string $tag, ?bool $includeDrafts = null): Collection
+    public function byTag(string $locale, string $tag, ?bool $includeDrafts = null): Collection
     {
         $normalizedTag = Str::of($tag)->trim()->lower()->value();
 
-        return $this->all($includeDrafts)
+        return $this->all($locale, $includeDrafts)
             ->filter(fn (BlogPostData $post) => in_array($normalizedTag, $post->tags, true))
             ->values();
     }
@@ -48,30 +49,37 @@ class BlogPostService
     /**
      * @return Collection<int, string>
      */
-    public function availableTags(?bool $includeDrafts = null): Collection
+    public function availableTags(string $locale, ?bool $includeDrafts = null): Collection
     {
-        return $this->all($includeDrafts)
+        return $this->all($locale, $includeDrafts)
             ->flatMap(fn (BlogPostData $post) => $post->tags)
             ->unique()
             ->sort()
             ->values();
     }
 
+    public function findTranslation(BlogPostData $post, string $targetLocale, ?bool $includeDrafts = null): ?BlogPostData
+    {
+        return $this->all($targetLocale, $includeDrafts)
+            ->first(fn (BlogPostData $candidate) => $candidate->translationKey === $post->translationKey);
+    }
+
     /**
      * @return Collection<int, BlogPostData>
      */
-    private function posts(): Collection
+    private function posts(string $locale): Collection
     {
-        $files = $this->postFiles();
+        $normalizedLocale = $this->normalizeLocale($locale);
+        $files = $this->postFiles($normalizedLocale);
         $fingerprint = md5(collect($files)
             ->map(fn (string $path) => $path.':'.filemtime($path))
             ->implode('|'));
 
         /** @var Collection<int, BlogPostData> $posts */
         $posts = Cache::remember(
-            'blog.posts.'.$fingerprint,
+            'blog.posts.'.$normalizedLocale.'.'.$fingerprint,
             now()->addMinutes(self::CACHE_TTL_MINUTES),
-            fn () => $this->parsePosts($files),
+            fn () => $this->parsePosts($files, $normalizedLocale),
         );
 
         return $posts;
@@ -81,10 +89,10 @@ class BlogPostService
      * @param  list<string>  $files
      * @return Collection<int, BlogPostData>
      */
-    private function parsePosts(array $files): Collection
+    private function parsePosts(array $files, string $locale): Collection
     {
         return collect($files)
-            ->map(fn (string $path) => $this->parsePost($path))
+            ->map(fn (string $path) => $this->parsePost($path, $locale))
             ->sortByDesc(fn (BlogPostData $post) => $post->date->timestamp)
             ->values();
     }
@@ -92,9 +100,9 @@ class BlogPostService
     /**
      * @return list<string>
      */
-    private function postFiles(): array
+    private function postFiles(string $locale): array
     {
-        $path = resource_path('posts');
+        $path = resource_path('posts/'.$locale);
 
         if (! File::isDirectory($path)) {
             return [];
@@ -110,7 +118,7 @@ class BlogPostService
         return $files;
     }
 
-    private function parsePost(string $path): BlogPostData
+    private function parsePost(string $path, string $locale): BlogPostData
     {
         $contents = File::get($path);
         [$frontMatter, $markdown] = $this->extractFrontMatter($contents, $path);
@@ -123,6 +131,7 @@ class BlogPostService
         $title = $this->stringMetadata($metadata, 'title', $path);
         $slug = $this->normalizeSlug($this->stringMetadata($metadata, 'slug', $path), $path);
         $description = $this->stringMetadata($metadata, 'description', $path);
+        $translationKey = $this->stringMetadata($metadata, 'translation_key', $path);
         $date = $this->parseDate($this->stringMetadata($metadata, 'date', $path), $path);
         $tags = $this->parseTags($metadata['tags'] ?? [], $path);
         $draft = (bool) ($metadata['draft'] ?? false);
@@ -132,6 +141,8 @@ class BlogPostService
             title: $title,
             slug: $slug,
             description: $description,
+            locale: $locale,
+            translationKey: $translationKey,
             date: $date,
             tags: $tags,
             draft: $draft,
@@ -231,6 +242,11 @@ class BlogPostService
     private function shouldIncludeDrafts(?bool $includeDrafts = null): bool
     {
         return $includeDrafts ?? config('app.env') === 'local';
+    }
+
+    private function normalizeLocale(string $locale): string
+    {
+        return LocalizedRoute::normalize($locale);
     }
 
     private function markdownConverter(): GithubFlavoredMarkdownConverter
