@@ -60,7 +60,7 @@ class BlogController extends Controller
     }
 
     /**
-     * @return array{pt: string, en: string}
+     * @return array<string, string>
      */
     private function localeUrlsForIndex(): array
     {
@@ -71,7 +71,7 @@ class BlogController extends Controller
     }
 
     /**
-     * @return array{pt: string, en: string}
+     * @return array<string, string>
      */
     private function localeUrlsForTag(string $tag): array
     {
@@ -82,7 +82,7 @@ class BlogController extends Controller
     }
 
     /**
-     * @return array{pt: string, en: string}
+     * @return array<string, string>
      */
     private function localeUrlsForPost(\App\Services\Blog\BlogPostData $post): array
     {

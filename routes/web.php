@@ -48,5 +48,4 @@ Route::prefix('en')
                 ->name('blog.show');
         });
     });
-|
 */
