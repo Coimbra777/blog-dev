@@ -4,6 +4,13 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/favicon.ico', function () {
+    return response()->file(public_path('favicon.svg'), [
+        'Content-Type' => 'image/svg+xml',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+});
+
 Route::controller(HomeController::class)->group(function () {
     Route::get('/', 'show')
         ->defaults('locale', 'pt')
