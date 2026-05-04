@@ -3,7 +3,7 @@
 return [
     'site_title' => 'Gabriel Coimbra | Backend, Laravel and Architecture',
     'site_description' => 'Backend developer focused on Laravel, Node.js, APIs, Docker, and software architecture.',
-    'brand' => 'Gabriel Coimbra',
+    'brand' => '',
     'brand_short' => 'GC',
     'nav' => [
         'home' => 'Home',
