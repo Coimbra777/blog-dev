@@ -5,7 +5,7 @@ WORKDIR /var/www
 RUN apt-get update && apt-get install -y \
     git curl unzip zip libpng-dev libonig-dev libxml2-dev \
     nodejs npm \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd sockets \
+    && docker-php-ext-install pdo_sqlite mbstring exif pcntl bcmath gd sockets \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -15,7 +15,15 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 RUN npm ci && npm run build
 
-RUN chmod -R 775 storage bootstrap/cache
+# Satisfaz Laravel (default DB) sem serviço MySQL; arquivo recriado na imagem a cada deploy.
+RUN touch /tmp/database.sqlite \
+    && chmod -R 775 storage bootstrap/cache
+
+ENV DB_CONNECTION=sqlite
+ENV DB_DATABASE=/tmp/database.sqlite
+ENV SESSION_DRIVER=file
+ENV CACHE_STORE=file
+ENV QUEUE_CONNECTION=sync
 
 EXPOSE 10000
 

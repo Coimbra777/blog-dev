@@ -2,6 +2,16 @@
 
 use Illuminate\Support\Str;
 
+$defaultConnection = env('DB_CONNECTION', 'sqlite');
+if (! is_string($defaultConnection) || $defaultConnection === '' || strtolower($defaultConnection) === 'null') {
+    $defaultConnection = 'sqlite';
+}
+
+$sqliteDatabase = env('DB_DATABASE', database_path('database.sqlite'));
+if (! is_string($sqliteDatabase) || $sqliteDatabase === '' || strtolower($sqliteDatabase) === 'null') {
+    $sqliteDatabase = database_path('database.sqlite');
+}
+
 return [
 
     /*
@@ -16,7 +26,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => $defaultConnection,
 
     /*
     |--------------------------------------------------------------------------
@@ -34,7 +44,7 @@ return [
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            'database' => $sqliteDatabase,
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
             'busy_timeout' => null,

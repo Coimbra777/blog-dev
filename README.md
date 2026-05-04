@@ -4,6 +4,8 @@ Este projeto contém um blog técnico em Laravel com posts em Markdown versionad
 
 ## Rodando localmente
 
+O `.env.example` segue defaults compatíveis com produção (SQLite em `/tmp`). Em desenvolvimento com Docker na pasta do projeto, você pode usar, por exemplo, `DB_DATABASE=database/database.sqlite` e criar o arquivo com `touch database/database.sqlite`.
+
 ```sh
 cp .env.example .env
 docker compose up -d
@@ -124,43 +126,76 @@ docker compose run --rm app php artisan test
 npm run build
 ```
 
-## Deploy no Render
+## Deploy no Render (sem banco)
 
-O blog não exige banco nem Redis para funcionar. Para uma configuração simples no Render, use cache em arquivo.
+O conteúdo do blog vem só dos arquivos Markdown no repositório. Ainda assim, o Laravel 12 espera uma conexão de banco **válida** (`config/database.php`): se `DB_CONNECTION` vier vazio, inválido ou `null`, o framework pode falhar com **Undefined array key "driver"** ou tentar abrir um SQLite inexistente.
 
-### Variáveis de ambiente mínimas
+A solução usada aqui é **SQLite em arquivo temporário** (`/tmp/database.sqlite`), criado na imagem de produção, **sem rodar migrations** e sem MySQL/Redis:
+
+- **Motivo:** satisfazer o default do Laravel e qualquer código que resolva `DB::connection()` sem precisar de serviço externo nem tabelas.
+- **Limitação:** `/tmp` é efêmero; não use esse SQLite para dados de negócio (o blog não grava artigos no banco).
+
+### Imagem de produção
+
+Use o arquivo `Dockerfile.render` no serviço Web do Render. Ele:
+
+- instala `pdo_sqlite`;
+- executa `touch /tmp/database.sqlite`;
+- define `ENV` padrão (`DB_CONNECTION`, `DB_DATABASE`, `SESSION_DRIVER`, `CACHE_STORE`, `QUEUE_CONNECTION`);
+- no start: `config:cache`, `route:cache`, `view:cache` e `php artisan serve` na porta `PORT` do Render.
+
+### Variáveis de ambiente recomendadas no painel
+
+Defina pelo menos:
 
 ```sh
-APP_NAME="Gabriel Coimbra"
+APP_NAME="Seu nome ou marca"
 APP_ENV=production
-APP_KEY=base64:...
+APP_KEY=base64:...        # obrigatório em produção
 APP_DEBUG=false
-APP_URL=https://seu-dominio.com
+APP_URL=https://seu-app.onrender.com
+
+DB_CONNECTION=sqlite
+DB_DATABASE=/tmp/database.sqlite
+
+SESSION_DRIVER=file
 CACHE_STORE=file
+QUEUE_CONNECTION=sync
+
+APP_MAINTENANCE_DRIVER=file
+APP_MAINTENANCE_STORE=file
+
 LOG_CHANNEL=stderr
 ```
 
-### Build command recomendado
+Não defina `DB_CONNECTION=null`. Valores vazios ou a string `null` são normalizados para `sqlite` em `config/database.php`, mas o caminho do arquivo (`DB_DATABASE`) deve continuar apontando para um arquivo que exista (a imagem já cria `/tmp/database.sqlite`).
+
+### Sem migrations no deploy
+
+O conteúdo do blog não depende de tabelas. **Não** use `php artisan migrate` no build nem no start deste projeto em produção.
+
+### Build e start “na mão” (sem Docker)
+
+Se preferir Native Environment no Render em vez de Docker:
+
+**Build**
 
 ```sh
 composer install --no-dev --optimize-autoloader
 npm ci
 npm run build
+touch /tmp/database.sqlite
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 ```
 
-Se `npm ci` não puder ser usado por ausência de lock compatível no ambiente, use `npm install`.
-
-### Start command recomendado
+**Start**
 
 ```sh
 php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
 ```
 
-### Observações para Render
+### Redeploy
 
-- O Render fornece a variável `$PORT`.
-- As rotas estão prontas para `php artisan route:cache`.
-- O conteúdo do blog continua sendo publicado apenas por commit/push dos arquivos Markdown.
+Após alterar variáveis ou o `Dockerfile.render`, faça **Manual Deploy** (ou push na branch conectada) para rebuild. O SQLite em `/tmp` é recriado na nova imagem; não é necessário migrar nada.
