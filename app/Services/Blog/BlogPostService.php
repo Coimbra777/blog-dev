@@ -7,6 +7,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use League\CommonMark\GithubFlavoredMarkdownConverter;
@@ -16,6 +17,11 @@ class BlogPostService
 {
     private const CACHE_TTL_MINUTES = 5;
 
+    /**
+     * Versão da estrutura em cache (posts keyed por slug + HTML lazy).
+     */
+    private const POSTS_CACHE_VERSION = 'v2';
+
     private ?GithubFlavoredMarkdownConverter $markdownConverter = null;
 
     /**
@@ -23,15 +29,41 @@ class BlogPostService
      */
     public function all(string $locale, ?bool $includeDrafts = null): Collection
     {
-        return $this->posts($locale)
+        return $this->orderedPosts($locale)
             ->filter(fn (BlogPostData $post) => $this->shouldExpose($post, $includeDrafts))
             ->values();
     }
 
     public function findBySlug(string $locale, string $slug, ?bool $includeDrafts = null): ?BlogPostData
     {
-        return $this->all($locale, $includeDrafts)
-            ->first(fn (BlogPostData $post) => $post->slug === $slug);
+        $normalizedSlug = $this->normalizeIncomingSlug($slug);
+        $post = $this->postsKeyedBySlug($locale)->get($normalizedSlug);
+
+        if ($post === null || ! $this->shouldExpose($post, $includeDrafts)) {
+            return null;
+        }
+
+        return $post;
+    }
+
+    /**
+     * Converte Markdown para HTML apenas quando necessário (ex.: página do post), com cache por slug + conteúdo.
+     */
+    public function withRenderedHtml(BlogPostData $post): BlogPostData
+    {
+        if ($post->html !== null) {
+            return $post;
+        }
+
+        $htmlCacheKey = $this->htmlCacheKey($post);
+
+        $html = Cache::remember(
+            $htmlCacheKey,
+            now()->addMinutes(self::CACHE_TTL_MINUTES),
+            fn () => (string) $this->markdownConverter()->convert($post->markdown),
+        );
+
+        return $post->withHtml($html);
     }
 
     /**
@@ -65,9 +97,22 @@ class BlogPostService
     }
 
     /**
+     * Posts ordenados por data (mais recentes primeiro), incluindo rascunhos conforme includeDrafts implícito no uso via {@see all()}.
+     *
      * @return Collection<int, BlogPostData>
      */
-    private function posts(string $locale): Collection
+    private function orderedPosts(string $locale): Collection
+    {
+        return $this->postsKeyedBySlug($locale)
+            ->values()
+            ->sortByDesc(fn (BlogPostData $post) => $post->date->timestamp)
+            ->values();
+    }
+
+    /**
+     * @return Collection<string, BlogPostData>
+     */
+    private function postsKeyedBySlug(string $locale): Collection
     {
         $normalizedLocale = $this->normalizeLocale($locale);
         $files = $this->postFiles($normalizedLocale);
@@ -75,26 +120,39 @@ class BlogPostService
             ->map(fn (string $path) => $path.':'.filemtime($path))
             ->implode('|'));
 
-        /** @var Collection<int, BlogPostData> $posts */
-        $posts = Cache::remember(
-            'blog.posts.'.$normalizedLocale.'.'.$fingerprint,
+        /** @var Collection<string, BlogPostData> $keyed */
+        $keyed = Cache::remember(
+            'blog.posts.'.self::POSTS_CACHE_VERSION.'.'.$normalizedLocale.'.'.$fingerprint,
             now()->addMinutes(self::CACHE_TTL_MINUTES),
-            fn () => $this->parsePosts($files, $normalizedLocale),
+            fn () => $this->parsePostsKeyedBySlug($files, $normalizedLocale),
         );
 
-        return $posts;
+        return $keyed;
     }
 
     /**
      * @param  list<string>  $files
-     * @return Collection<int, BlogPostData>
+     * @return Collection<string, BlogPostData>
      */
-    private function parsePosts(array $files, string $locale): Collection
+    private function parsePostsKeyedBySlug(array $files, string $locale): Collection
     {
         return collect($files)
-            ->map(fn (string $path) => $this->parsePost($path, $locale))
-            ->sortByDesc(fn (BlogPostData $post) => $post->date->timestamp)
-            ->values();
+            ->map(function (string $path) use ($locale): ?BlogPostData {
+                try {
+                    return $this->parsePostWithoutHtml($path, $locale);
+                } catch (\Throwable $e) {
+                    Log::warning('Blog: arquivo de post ignorado após erro de parse.', [
+                        'path' => $path,
+                        'exception' => $e::class,
+                        'message' => $e->getMessage(),
+                    ]);
+
+                    return null;
+                }
+            })
+            ->filter()
+            /** @var Collection<int, BlogPostData> $parsed */
+            ->keyBy(fn (BlogPostData $post) => $post->slug);
     }
 
     /**
@@ -118,11 +176,16 @@ class BlogPostService
         return $files;
     }
 
-    private function parsePost(string $path, string $locale): BlogPostData
+    private function parsePostWithoutHtml(string $path, string $locale): BlogPostData
     {
         $contents = File::get($path);
         [$frontMatter, $markdown] = $this->extractFrontMatter($contents, $path);
-        $metadata = Yaml::parse($frontMatter);
+
+        try {
+            $metadata = Yaml::parse($frontMatter);
+        } catch (\Throwable $e) {
+            throw new InvalidArgumentException("YAML do front matter inválido no post [{$path}]: ".$e->getMessage(), 0, $e);
+        }
 
         if (! is_array($metadata)) {
             throw new InvalidArgumentException("Front matter inválido no post [{$path}].");
@@ -135,7 +198,6 @@ class BlogPostService
         $date = $this->parseDate($this->stringMetadata($metadata, 'date', $path), $path);
         $tags = $this->parseTags($metadata['tags'] ?? [], $path);
         $draft = (bool) ($metadata['draft'] ?? false);
-        $html = (string) $this->markdownConverter()->convert($markdown);
 
         return new BlogPostData(
             title: $title,
@@ -147,7 +209,7 @@ class BlogPostService
             tags: $tags,
             draft: $draft,
             markdown: $markdown,
-            html: $html,
+            html: null,
             readingTimeMinutes: $this->estimateReadingTime($markdown),
         );
     }
@@ -192,6 +254,11 @@ class BlogPostService
         return $normalized;
     }
 
+    private function normalizeIncomingSlug(string $slug): string
+    {
+        return Str::of($slug)->trim()->lower()->slug('-')->value();
+    }
+
     private function parseDate(string $date, string $path): CarbonImmutable
     {
         $parsedDate = CarbonImmutable::createFromFormat('Y-m-d', $date);
@@ -232,6 +299,11 @@ class BlogPostService
         preg_match_all('/[\p{L}\p{N}_-]+/u', strip_tags($markdown), $matches);
 
         return max(1, (int) ceil(count($matches[0]) / 200));
+    }
+
+    private function htmlCacheKey(BlogPostData $post): string
+    {
+        return 'blog.post.html.'.self::POSTS_CACHE_VERSION.'.'.md5($post->locale.'|'.$post->slug.'|'.$post->markdown);
     }
 
     private function shouldExpose(BlogPostData $post, ?bool $includeDrafts = null): bool

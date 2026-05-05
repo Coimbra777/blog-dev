@@ -24,16 +24,12 @@ Se seu container `app` também tiver Node.js, você pode rodar os comandos de fr
 
 ## Rotas do blog
 
-- Português:
+- Português (ativas):
   - `/`
   - `/blog`
   - `/blog/{slug}`
   - `/blog/tag/{tag}`
-- Inglês:
-  - `/en`
-  - `/en/blog`
-  - `/en/blog/{slug}`
-  - `/en/blog/tag/{tag}`
+- Inglês (`/en/...`): rotas **desativadas** no código (`routes/web.php`); o diretório `resources/posts/en/` pode existir para conteúdo futuro.
 
 ## Estrutura dos posts
 
@@ -142,7 +138,9 @@ Use o arquivo `Dockerfile.render` no serviço Web do Render. Ele:
 - instala `pdo_sqlite`;
 - executa `touch /tmp/database.sqlite`;
 - define `ENV` padrão (`DB_CONNECTION`, `DB_DATABASE`, `SESSION_DRIVER`, `CACHE_STORE`, `QUEUE_CONNECTION`);
-- no start: `config:cache`, `route:cache`, `view:cache` e `php artisan serve` na porta `PORT` do Render.
+- no start: `config:cache`, `route:cache`, `view:cache` e o **servidor HTTP embutido do PHP** (`php -S 0.0.0.0:${PORT:-10000} -t public`), não `php artisan serve`.
+
+Motivo: no PHP CLI oficial não há `php artisan serve` como processo long-lived empacotado da mesma forma na imagem minimalista; o built-in server (`php -S`) atende tráfego modesto do plano free. Para maior robustez no futuro, troque por PHP-FPM + nginx ou outro host HTTP.
 
 ### Variáveis de ambiente recomendadas no painel
 
@@ -191,6 +189,14 @@ php artisan view:cache
 ```
 
 **Start**
+
+Equivalente ao `Dockerfile.render` (servidor embutido do PHP):
+
+```sh
+php -S 0.0.0.0:${PORT:-10000} -t public
+```
+
+Alternativa em ambientes com Artisan disponível e preferência por um wrapper Laravel:
 
 ```sh
 php artisan serve --host=0.0.0.0 --port=${PORT:-10000}

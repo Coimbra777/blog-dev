@@ -38,6 +38,8 @@ class BlogController extends Controller
 
         abort_unless($post !== null, 404);
 
+        $post = $this->blogPosts->withRenderedHtml($post);
+
         return view('blog.show', $this->localizedViewData($locale, [
             'post' => $post,
             'canonical' => route(LocalizedRoute::routeName($locale, 'blog.show'), $post->slug),

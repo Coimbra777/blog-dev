@@ -21,9 +21,29 @@ final readonly class BlogPostData
         public array $tags,
         public bool $draft,
         public string $markdown,
-        public string $html,
+        public ?string $html,
         public int $readingTimeMinutes,
     ) {
+    }
+
+    /**
+     * @param  list<string>  $tags
+     */
+    public function withHtml(string $html): self
+    {
+        return new self(
+            title: $this->title,
+            slug: $this->slug,
+            description: $this->description,
+            locale: $this->locale,
+            translationKey: $this->translationKey,
+            date: $this->date,
+            tags: $this->tags,
+            draft: $this->draft,
+            markdown: $this->markdown,
+            html: $html,
+            readingTimeMinutes: $this->readingTimeMinutes,
+        );
     }
 
     public function formattedDate(string $locale): string
