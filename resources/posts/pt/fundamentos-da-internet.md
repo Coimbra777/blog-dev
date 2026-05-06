@@ -1,3 +1,25 @@
+---
+title: "Fundamentos da Tecnologia: o que realmente acontece por baixo dos panos"
+slug: "fundamentos-da-tecnologia-como-a-internet-funciona"
+translation_key: "fundamentos-tecnologia-internet"
+description: "Uma explicação simples e intuitiva sobre internet, DNS, HTTP, TCP, bancos de dados, APIs, cache, filas e tudo que acontece por baixo dos panos quando acessamos um site."
+date: "2026-05-06"
+draft: false
+tags:
+    - fundamentos
+    - internet
+    - redes
+    - backend
+    - http
+    - tcp
+    - dns
+    - banco-de-dados
+    - arquitetura
+    - nodejs
+    - laravel
+    - nestjs
+---
+
 # Fundamentos da Tecnologia: o que realmente acontece por baixo dos panos
 
 Se você entender esses fundamentos, frameworks como Laravel, NestJS, Vue.js e até microsserviços começam a fazer muito mais sentido.
@@ -17,7 +39,7 @@ Então vamos construir isso do zero, de forma simples e intuitiva.
 
 ---
 
-# O que é a internet de verdade?
+## O que é a internet de verdade?
 
 Imagine o mundo inteiro conectado por:
 
@@ -34,7 +56,7 @@ A internet é literalmente:
 
 ---
 
-# O que acontece quando você abre um site?
+## O que acontece quando você abre um site?
 
 Exemplo:
 
@@ -50,7 +72,7 @@ Mas por baixo dos panos acontece MUITA coisa.
 
 ---
 
-# Visão geral do processo
+## Visão geral do processo
 
 O fluxo é mais ou menos assim:
 
@@ -76,7 +98,7 @@ Agora vamos entender etapa por etapa.
 
 ---
 
-# O navegador: “eu quero acessar google.com”
+## O navegador: “eu quero acessar google.com”
 
 Seu navegador (Chrome, Firefox etc.) fala:
 
@@ -98,7 +120,7 @@ Isso é um IP.
 
 ---
 
-# DNS — o tradutor da internet
+## DNS — o tradutor da internet
 
 O DNS funciona como uma agenda telefônica.
 
@@ -130,7 +152,7 @@ Agora o navegador já sabe para onde enviar a requisição.
 
 ---
 
-# O que é IP?
+## O que é IP?
 
 IP é o endereço de uma máquina na internet.
 
@@ -153,7 +175,7 @@ Sem IP:
 
 ---
 
-# A viagem da requisição
+## A viagem da requisição
 
 Agora o computador sabe o IP.
 
@@ -167,7 +189,7 @@ Essa mensagem viaja pela internet.
 
 ---
 
-# A internet funciona com pacotes
+## A internet funciona com pacotes
 
 A mensagem não vai inteira.
 
@@ -181,7 +203,7 @@ Internet funciona assim.
 
 ---
 
-# Quem leva os pacotes?
+## Quem leva os pacotes?
 
 Os roteadores.
 
@@ -203,7 +225,7 @@ até chegar no servidor.
 
 ---
 
-# O que são protocolos?
+## O que são protocolos?
 
 Protocolos são regras de comunicação.
 
@@ -223,7 +245,7 @@ Exemplo:
 
 ---
 
-# TCP — o protocolo confiável
+## TCP — o protocolo confiável
 
 O TCP garante que:
 
@@ -249,7 +271,7 @@ Se algo se perder:
 
 ---
 
-# HTTP — o protocolo da web
+## HTTP — o protocolo da web
 
 HTTP é o idioma da internet moderna.
 
@@ -268,7 +290,7 @@ Isso significa:
 
 ---
 
-# Métodos HTTP
+## Métodos HTTP
 
 Os principais métodos são:
 
@@ -295,7 +317,7 @@ POST /usuarios
 
 ---
 
-# O servidor recebe a requisição
+## O servidor recebe a requisição
 
 Agora entram tecnologias como:
 
@@ -319,7 +341,7 @@ e decide:
 
 ---
 
-# O backend é um garçom inteligente
+## O backend é um garçom inteligente
 
 Imagine um restaurante.
 
@@ -340,7 +362,7 @@ Backend é exatamente isso.
 
 ---
 
-# E o banco de dados?
+## E o banco de dados?
 
 O backend normalmente precisa buscar dados.
 
@@ -352,7 +374,7 @@ Então ele conversa com bancos como:
 
 ---
 
-# Como o banco funciona por baixo dos panos?
+## Como o banco funciona por baixo dos panos?
 
 Pense em um banco de dados como:
 
@@ -367,7 +389,7 @@ Ele precisa:
 
 ---
 
-# O que acontece quando salva um usuário?
+## O que acontece quando salva um usuário?
 
 Exemplo:
 
@@ -386,7 +408,7 @@ O banco:
 
 ---
 
-# Índices — o índice do livro
+## Índices — o índice do livro
 
 Sem índice:
 
@@ -408,7 +430,7 @@ Capítulo X → página 92
 
 ---
 
-# Por que banco de dados é difícil?
+## Por que banco de dados é difícil?
 
 Porque milhares de pessoas acessam ao mesmo tempo.
 
@@ -425,7 +447,7 @@ Sem controle:
 
 ---
 
-# Consistência
+## Consistência
 
 Exemplo bancário:
 
@@ -446,7 +468,7 @@ Se só metade acontecer:
 
 ---
 
-# Transações
+## Transações
 
 O banco resolve isso usando:
 
@@ -472,7 +494,7 @@ ROLLBACK
 
 ---
 
-# ACID — a base dos bancos relacionais
+## ACID — a base dos bancos relacionais
 
 Os bancos famosos seguem:
 
@@ -487,27 +509,27 @@ Os bancos famosos seguem:
 
 ---
 
-# Explicando ACID de forma simples
+## Explicando ACID de forma simples
 
-## Atomicidade
+### Atomicidade
 
 Ou faz tudo, ou não faz nada.
 
 ---
 
-## Consistência
+### Consistência
 
 Os dados nunca ficam inválidos.
 
 ---
 
-## Isolamento
+### Isolamento
 
 Duas pessoas mexendo ao mesmo tempo não se atrapalham.
 
 ---
 
-## Durabilidade
+### Durabilidade
 
 Salvou?
 
@@ -515,17 +537,17 @@ Mesmo sem energia continua salvo.
 
 ---
 
-# Problemas de concorrência
+## Problemas de concorrência
 
 Quando várias pessoas acessam dados ao mesmo tempo, surgem problemas.
 
-## Dirty Read
+### Dirty Read
 
 Você vê algo que ainda nem foi confirmado.
 
 ---
 
-## Non-repeatable Read
+### Non-repeatable Read
 
 Você lê uma coisa.
 Lê de novo.
@@ -533,14 +555,14 @@ Mudou.
 
 ---
 
-## Phantom Read
+### Phantom Read
 
 Você faz uma busca.
 Depois aparecem linhas “fantasmas”.
 
 ---
 
-# Níveis de isolamento
+## Níveis de isolamento
 
 O banco escolhe quanto quer proteger os dados.
 
@@ -553,7 +575,7 @@ O banco escolhe quanto quer proteger os dados.
 
 ---
 
-# E os frameworks?
+## E os frameworks?
 
 Agora vem a parte interessante.
 
@@ -585,7 +607,7 @@ por baixo dos panos acontece:
 
 ---
 
-# O que é uma API?
+## O que é uma API?
 
 API é:
 
@@ -605,7 +627,7 @@ O frontend sabe:
 
 ---
 
-# Frontend e backend conversando
+## Frontend e backend conversando
 
 Fluxo real:
 
@@ -627,7 +649,7 @@ Frontend renderiza
 
 ---
 
-# E WebSocket?
+## E WebSocket?
 
 HTTP funciona assim:
 
@@ -650,7 +672,7 @@ Por isso serve para:
 
 ---
 
-# E cache?
+## E cache?
 
 Buscar no banco é caro.
 
@@ -660,7 +682,7 @@ O Redis guarda dados na RAM, que é extremamente rápida.
 
 ---
 
-# E filas?
+## E filas?
 
 Algumas tarefas demoram:
 
@@ -682,7 +704,7 @@ A aplicação fala:
 
 ---
 
-# E cloud?
+## E cloud?
 
 Cloud é basicamente:
 
@@ -704,7 +726,7 @@ Você aluga:
 
 ---
 
-# O mais importante
+## O mais importante
 
 Grandes desenvolvedores entendem:
 
@@ -724,7 +746,7 @@ consegue aprender qualquer stack.
 
 ---
 
-# Como estudar isso de verdade
+## Como estudar isso de verdade
 
 Uma boa ordem de estudo seria:
 
@@ -741,7 +763,7 @@ Uma boa ordem de estudo seria:
 
 ---
 
-# O momento em que “a ficha cai”
+## O momento em que “a ficha cai”
 
 Quando você conseguir enxergar mentalmente isso:
 
