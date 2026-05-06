@@ -3,7 +3,7 @@ title: "Fundamentos da Tecnologia: o que realmente acontece por baixo dos panos"
 slug: "fundamentos-da-tecnologia-como-a-internet-funciona"
 translation_key: "fundamentos-tecnologia-internet"
 description: "Uma explicação simples e intuitiva sobre internet, DNS, HTTP, TCP, bancos de dados, APIs, cache, filas e tudo que acontece por baixo dos panos quando acessamos um site."
-date: "2026-05-06"
+date: "2026-05-01"
 draft: false
 tags:
     - fundamentos
