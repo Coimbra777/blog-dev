@@ -22,6 +22,21 @@ npm run build
 
 Se seu container `app` também tiver Node.js, você pode rodar os comandos de frontend dentro dele.
 
+## Configuração do portfólio
+
+Os dados exibidos na home e no footer podem ser configurados por variáveis de ambiente:
+
+```sh
+PORTFOLIO_NAME="Gabriel Coimbra"
+PORTFOLIO_EMAIL=seu-email@dominio.com
+PORTFOLIO_LINKEDIN_URL=
+PORTFOLIO_GITHUB_URL=
+PORTFOLIO_WHATSAPP_URL=
+```
+
+- `PORTFOLIO_EMAIL` cai para `MAIL_FROM_ADDRESS` quando não for informado.
+- LinkedIn, GitHub e WhatsApp só aparecem na interface quando configurados.
+
 ## Rotas do blog
 
 - Português (ativas):

@@ -19,6 +19,7 @@ trait InteractsWithLocalizedViews
             'homeUrl' => route(LocalizedRoute::routeName($locale, 'home')),
             'blogIndexUrl' => route(LocalizedRoute::routeName($locale, 'blog.index')),
             'aboutUrl' => route(LocalizedRoute::routeName($locale, 'home')).'#sobre',
+            'contactUrl' => route(LocalizedRoute::routeName($locale, 'home')).'#contato',
         ], $extra);
     }
 }

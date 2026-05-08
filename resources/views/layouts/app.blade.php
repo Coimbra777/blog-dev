@@ -5,10 +5,34 @@
     $homeUrl = $homeUrl ?? route(LocalizedRoute::routeName($currentLocale, 'home'));
     $blogIndexUrl = $blogIndexUrl ?? route(LocalizedRoute::routeName($currentLocale, 'blog.index'));
     $aboutUrl = $aboutUrl ?? $homeUrl . '#sobre';
+    $contactUrl = $contactUrl ?? $homeUrl . '#contato';
     $localeUrls = $localeUrls ?? [
         'pt' => route('home'),
         // 'en' => route('en.home'), // PT/EN: rotas /en desativadas
     ];
+    $portfolioName = config('portfolio.name');
+    $contactLinks = array_values(array_filter([
+        [
+            'label' => __('blog.contact.email'),
+            'href' => config('portfolio.email') ? 'mailto:' . config('portfolio.email') : null,
+            'value' => config('portfolio.email'),
+        ],
+        [
+            'label' => __('blog.contact.linkedin'),
+            'href' => config('portfolio.linkedin'),
+            'value' => config('portfolio.linkedin'),
+        ],
+        [
+            'label' => __('blog.contact.github'),
+            'href' => config('portfolio.github'),
+            'value' => config('portfolio.github'),
+        ],
+        [
+            'label' => __('blog.contact.whatsapp'),
+            'href' => config('portfolio.whatsapp'),
+            'value' => config('portfolio.whatsapp'),
+        ],
+    ], static fn (array $link): bool => filled($link['href'])));
 @endphp
 
 <!DOCTYPE html>
@@ -61,13 +85,13 @@
                         {{ __('blog.brand_short') }}
                     </a>
 
-                    <nav class="flex items-center gap-5 text-sm text-white/70">
-                        <a href="{{ $homeUrl }}"
-                            class="transition hover:text-[#fc8e00] focus:outline-none focus:ring-2 focus:ring-[#fc8e00]/60 focus:ring-offset-2 focus:ring-offset-[#151515]">{{ __('blog.nav.home') }}</a>
+                    <nav class="flex flex-wrap items-center gap-5 text-sm text-white/70">
                         <a href="{{ $blogIndexUrl }}"
                             class="transition hover:text-[#fc8e00] focus:outline-none focus:ring-2 focus:ring-[#fc8e00]/60 focus:ring-offset-2 focus:ring-offset-[#151515]">{{ __('blog.nav.posts') }}</a>
                         <a href="{{ $aboutUrl }}"
                             class="transition hover:text-[#fc8e00] focus:outline-none focus:ring-2 focus:ring-[#fc8e00]/60 focus:ring-offset-2 focus:ring-offset-[#151515]">{{ __('blog.nav.about') }}</a>
+                        <a href="{{ $contactUrl }}"
+                            class="transition hover:text-[#fc8e00] focus:outline-none focus:ring-2 focus:ring-[#fc8e00]/60 focus:ring-offset-2 focus:ring-offset-[#151515]">{{ __('blog.nav.contact') }}</a>
                     </nav>
                 </div>
             </div>
@@ -78,8 +102,36 @@
         </main>
 
         <footer class="border-t border-white/10">
-            <div class="mx-auto w-full max-w-5xl px-6 py-6 text-sm text-white/45 lg:px-8">
-                © 2026 {{ __('blog.brand') }}. {{ __('blog.footer') }}
+            <div class="mx-auto grid w-full max-w-5xl gap-10 px-6 py-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1fr)] lg:px-8">
+                <div class="space-y-3">
+                    <p class="text-sm font-semibold uppercase tracking-[0.28em] text-[#fc8e00]">{{ $portfolioName }}</p>
+                    <p class="max-w-md text-sm leading-7 text-white/55">{{ __('blog.footer.tagline') }}</p>
+                    <p class="text-sm text-white/38">© {{ now()->year }} {{ $portfolioName }}</p>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-xs font-medium uppercase tracking-[0.28em] text-white/45">{{ __('blog.footer.quick_links') }}</p>
+                    <ul class="space-y-3 text-sm text-white/65">
+                        <li><a href="{{ $blogIndexUrl }}" class="transition hover:text-[#fc8e00]">{{ __('blog.nav.posts') }}</a></li>
+                        <li><a href="{{ $aboutUrl }}" class="transition hover:text-[#fc8e00]">{{ __('blog.nav.about') }}</a></li>
+                        <li><a href="{{ $contactUrl }}" class="transition hover:text-[#fc8e00]">{{ __('blog.nav.contact') }}</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-xs font-medium uppercase tracking-[0.28em] text-white/45">{{ __('blog.footer.social_links') }}</p>
+                    <ul class="space-y-3 text-sm text-white/65">
+                        @forelse ($contactLinks as $contactLink)
+                            <li>
+                                <a href="{{ $contactLink['href'] }}" class="transition hover:text-[#fc8e00]">
+                                    {{ $contactLink['label'] }}
+                                </a>
+                            </li>
+                        @empty
+                            <li class="text-white/38">{{ __('blog.contact.empty') }}</li>
+                        @endforelse
+                    </ul>
+                </div>
             </div>
         </footer>
     </div>
